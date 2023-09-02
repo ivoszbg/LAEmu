@@ -1,0 +1,156 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2023, Ivaylo Ivanov <ivo.ivanov@null.net>
+ */
+
+#ifndef PERIPH_H
+#define PERIPH_H
+
+#define DEVICE_NAME_LEN 256
+
+#define SHA1_BASE_ADDR			(0x30100000)
+#define SHA2_BASE_ADDR			(0x30200000)
+
+#define NAND_DLL_BASE_ADDR		(0x31000000)
+#define FMI0_BASE_ADDR			(0x31200000)
+#define FMI1_BASE_ADDR			(0x31300000)
+#define FMI_VERSION			(5)
+
+#define SPI0_BASE_ADDR			(0x32000000)
+#define SPI1_BASE_ADDR			(0x32100000)
+#define SPI2_BASE_ADDR			(0x32200000)
+#define SPI3_BASE_ADDR			(0x32300000)
+#define SPI4_BASE_ADDR			(0x32400000)
+#define SPI_VERSION			(1)
+#define SPIS_COUNT			(5)
+
+#define UART0_BASE_ADDR			(0x32500000)
+#define UART1_BASE_ADDR			(0x32600000)
+#define UART2_BASE_ADDR			(0x32700000)
+#define UART3_BASE_ADDR			(0x32800000)
+#define UART4_BASE_ADDR			(0x32900000)
+#define UART5_BASE_ADDR			(0x32A00000)
+#define UART6_BASE_ADDR			(0x32B00000)
+#define UART_VERSION			(1)
+#define UARTS_COUNT			(7)
+
+#define PKE_BASE_ADDR			(0x33100000)
+
+#define IIC_BASE_ADDR			(0x33200000)
+#define IIC_SPACING			(0x00100000)
+#define IICS_COUNT			(3)
+
+#define AUDIO_BASE_ADDR			(0x34000000)
+
+#define USBPHY_BASE_ADDR		(0x36000000)
+#define USBPHY_VERSION			(4)
+#define USBOTG_BASE_ADDR		(0x36100000)
+#define UPERF_WIDGETS_BASE_ADDR		(0x36E00000)
+#define UPERF_PL301_BASE_ADDR		(0x36F00000)
+
+#define CDMA_BASE_ADDR			(0x37000000)
+#define CDMA_VERSION			5
+
+#define VENC_BASE_ADDR			(0x38000000)
+
+#define VDEC_BASE_ADDR			(0x38100000)
+
+#define JPEG0_BASE_ADDR			(0x38200000)
+#define JPEG1_BASE_ADDR			(0x38500000)
+
+#define SCALER_BASE_ADDR		(0x38300000)
+#define SCALER_SPACING			(0x00100000)
+
+#define NRT_DART_BASE_ADDR		(0x38B00000)
+
+#define NRT_DART_WIDGETS_BASE_ADDR	(0x38C00000)
+#define NRT_DART_PL301_BASE_ADDR	(0x38D00000)
+
+#define NRT_TOP_WIDGETS_BASE_ADDR	(0x38E00000)
+#define NRT_TOP_PL301_BASE_ADDR		(0x38F00000)
+
+#define CLCD_BASE_ADDR			(0x39200000)
+#define CLCD_VERSION			(1)
+#define DITHER_VERSION			(1)
+
+#define DITHER0_BASE_ADDR		(0x39300000)
+
+#define TVOUT_BASE_ADDR			(0x39400000)
+
+#define DSIM_BASE_ADDR			(0x39500000)
+#define DSIM_LANE_COUNT			(4)
+#define DSIM_VERSION			(1)
+
+#define RGBOUT_BASE_ADDR		(0x39600000)
+
+#define DP_BASE_ADDR			(0x39700000)
+#define DISPLAYPORT_VERSION		(1)
+
+#define DITHER1_BASE_ADDR		(0x39800000)
+
+#define LPDP_BASE_ADDR			(0x39900000)
+
+#define ISP_BASE_ADDR			(0x3A000000)
+
+#define DISP0_BASE_ADDR			(0x3A100000)
+#define DISP1_BASE_ADDR			(0x3A200000)
+#define CLCD_DISPLAYPIPE_BASE_ADDR	(DISP0_BASE_ADDR)
+#define RGBOUT_DISPLAYPIPE_BASE_ADDR	(DISP1_BASE_ADDR)
+#define DISP_VERSION			(3)
+
+#define RT_DART_BASE_ADDR		(0x3A400000)
+
+#define RT_TOP_WIDGETS_BASE_ADDR	(0x3A500000)
+#define RT_TOP_PL301_BASE_ADDR		(0x3A600000)
+
+#define ADSP_BASE_ADDR			(0x3B000000)
+
+#define AMP_BASE_ADDR			(0x3D000000)
+#define AMP_SPACING			(0x00100000)
+
+#define SCC_BASE_ADDR			(0x3D200000)
+
+#define PMGR_BASE_ADDR			(0x3F100000)
+
+#define AIC_BASE_ADDR			(0x3F200000)
+
+#define IOP_BASE_ADDR			(0x3F300000)
+
+#define ROSC_BASE_ADDR			(0x3F400000)
+#define ROSC_MASK			(0x57FF)
+#define ROSC_WITH_CLOCK			(0)
+
+#define CHIPID_BASE_ADDR		(0x3F500000)
+
+#define SWI_BASE_ADDR			(0x3F600000)
+#define DWI_BASE_ADDR			(0x3F700000)
+
+#define AMC_BASE_ADDR			(0x3F800000)
+
+#define GPIO_BASE_ADDR			(0x3FA00000)
+#define GPIO_VERSION			(2)
+#define GPIO_GROUP_COUNT		(29)
+#define GPIO_PAD_SPI			(GPIO_GROUP_COUNT)
+
+#define PIO_BASE_ADDR			(0x3FB00000)
+#define PIO_SPACING			(0x00100000)
+
+#define CIM_BASE_ADDR			(0x3FD00000)
+
+#define CDIO_WIDGETS_BASE_ADDR		(0x3FE00000)
+#define CDIO_PL301_BASE_ADDR		(0x3FF00000)
+
+struct device {
+	uint64_t base;
+	uint64_t size;
+	uc_cb_hookmem_t callback;
+	uc_hook hook;
+	void *state;
+	char name[DEVICE_NAME_LEN];
+};
+
+extern struct uart_state uart0_state;
+
+extern struct device *devices[];
+
+#endif // PERIPH_H
