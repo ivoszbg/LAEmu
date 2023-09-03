@@ -6,14 +6,18 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-// memory address where emulation starts
-#define MEMORY_BASE 0x80000000
+/* The kernel memory address */
 #define ADDRESS 0x84000000
 
 #define SDRAM_BASE			(0x80000000)
 #define SDRAM_BANK_LEN			(0x20000000)
 #define SDRAM_BANK_COUNT		(2)
-#define SDIO_BASE_ADDR			(0x30000000)
+#define VROM_BASE			(0x3F000000ULL)
+#define VROM_BANK_LEN			(0x00100000ULL)
+#define VROM_LEN			(0x00010000ULL)
+#define SRAM_BASE			(0x10000000ULL)
+#define SRAM_BANK_LEN			(0x00100000ULL)
+#define SRAM_LEN			(0x00080000ULL)
 
 struct memory_mapping {
 	uint64_t base;
@@ -30,8 +34,10 @@ struct memory_mapping {
 */
 
 struct memory_mapping memmap[] = {
-	/* PMGR */
-	{ 0x3F100000, 0x00100000, UC_PROT_READ },
+	/* SRAM */
+	{ SRAM_BASE, SRAM_BANK_LEN, UC_PROT_READ },
+	/* VROM */
+	{ VROM_BASE, VROM_BANK_LEN, UC_PROT_READ },
 	/* DRAM */
 	{ SDRAM_BASE, (SDRAM_BANK_LEN * SDRAM_BANK_COUNT), UC_PROT_ALL },
 	/* End of map */

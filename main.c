@@ -62,11 +62,28 @@ int main(int argc, char **argv, char **envp) {
 	uc_err err;
 	uc_hook trace1, trace2;
 
+	char *bios_file = NULL;
+	char *kernel_file = NULL;
 	uint64_t end;
 
-	printf("Setting up the emulator\n");
+	struct memory_mapping map;
 
-	// Initialize emulator in ARM mode
+	printf(">>>> Setting up the emulator\n");
+
+	for (int i = 1; i < argc; i++) {
+		/* Check arguments */
+		if (strncmp(argv[i], "--bios=", 7) == 0)
+			bios_file = argv[i] + 7;  // Store the BIOS file name (skip the "--bios=" part)
+		if (strncmp(argv[i], "--kernel=", 9) == 0)
+			kernel_file = argv[i] + 9;  // Store the BIOS file name (skip the "--bios=" part)
+	}
+
+	if(kernel_file == NULL && bios_file == NULL) {
+		printf(">>>> You have to provide either --bios= or --kernel=\n");
+		return 0;
+	}
+
+	/* Initialize emulator */
 	err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc);
 	if (err) {
 		printf("Failed on uc_open() with error returned: %u (%s)\n", err,
@@ -74,32 +91,41 @@ int main(int argc, char **argv, char **envp) {
 		return 	0;
 	}
 
-	struct memory_mapping map;
+	/* Set cores to Cortex A15 */
+	err = uc_ctl_set_cpu_model(uc, UC_CPU_ARM_CORTEX_A15);
+	if (err) {
+		printf("Failed on uc_ctl() with error returned: %u (%s)\n", err,
+			   uc_strerror(err));
+		return 	0;
+	}
 
+	/* Initialize the memory map */
 	for (int i = 0; memmap[i].perms != UC_PROT_NONE; i++) {
 		map = memmap[i];
 		if ((err = uc_mem_map(uc, map.base, map.size, map.perms)))
 			return err;
 	}
 
+	/* Register peripherals */
 	for (int i = 0; devices[i] != NULL; i++)
 		if ((err = register_device(uc, devices[i])) != UC_ERR_OK)
 			return err;
 
-	if ((err = load_image(uc, argv[1], ADDRESS, &end)) != UC_ERR_OK) {
-		printf("load_image: %s\n", uc_strerror(err));
-		goto cleanup;
+	/* Load either the BIOS or the Kernel image inside the memory */
+	if(bios_file == NULL) {
+		if ((err = load_image(uc, kernel_file, ADDRESS, &end)) != UC_ERR_OK) {
+			printf("load_image: %s\n", uc_strerror(err));
+			goto cleanup;
+		}
 	}
 
-	printf("Booting..\n");
+	printf(">>>> Booting at 0x%x..\n", ADDRESS);
 	if ((err = uc_emu_start(uc, ADDRESS, end, 0, 0)) != UC_ERR_OK) {
 		printf("\n\n>>>> A6Emu: %s\n", uc_strerror(err));
-		//dump_regs(uc);
 		goto cleanup;
 	}
 
-	// now print out some registers
-	printf(">>> Emulation done. Below is the CPU context\n");
+	/* We should never get here (apart from if we're testing small assembly binaries */
 
 	uc_close(uc);
 
